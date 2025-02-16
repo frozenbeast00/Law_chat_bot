@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # FastAPI Backend URL
-API_URL = "http://127.0.0.1:8000/ask"  # Matching the backend endpoint
+API_URL = "https://law-chat-bot.onrender.com"  # Matching the backend endpoint
 
 # Streamlit App UI
 st.title("📜 Legal Study Chatbot")
