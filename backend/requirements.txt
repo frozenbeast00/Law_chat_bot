@@ -1,4 +1,8 @@
-fastapi
-uvicorn
-requests
-google-generativeai
+fastapi==0.115.0
+uvicorn==0.30.6
+requests==2.32.3
+google-generativeai==0.8.1
+sentence-transformers==3.0.1
+pymilvus==2.4.4
+pdfminer.six==20231228
+python-docx==1.1.2
