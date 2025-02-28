@@ -137,6 +137,7 @@ async def upload_document(file: UploadFile = File(...)):
             os.remove(file_path)
 
 # Retrieve Documents from Zilliz
+# Retrieve Documents from Zilliz
 def retrieve_documents(query: str, top_k: int = 5) -> List[str]:
     try:
         query_embedding = embedding_model.encode(query).tolist()
@@ -148,11 +149,11 @@ def retrieve_documents(query: str, top_k: int = 5) -> List[str]:
             limit=top_k,
             output_fields=["content"]
         )
-        return [hit.entity.get("content", "") for hit in search_results[0]]
+        # Simplified: Directly get the 'content' field since it's specified in output_fields
+        return [hit.entity.get("content") for hit in search_results[0]]
     except Exception as e:
-        print(f"Document Retrieval Error: {e}")
+        print(f"Document Retrieval Error: {str(e)}")
         return []
-
 # Web Search
 INDIAN_LAW_KEYWORDS = ["Indian Penal Code", "IPC", "CrPC", "Constitution of India", "Supreme Court"]
 
@@ -186,7 +187,7 @@ def summarize_content(query: str, retrieved_docs: List[str], latest_updates: Lis
         latest_updates=sources
     )
     try:
-        model = genai.GenerativeModel("gemini-pro")
+        model = genai.GenerativeModel("gemini-2.0-flash-thinking-exp-01-21")
         response = model.generate_content(prompt)
         return response.text if response and hasattr(response, "text") else "Couldn't generate a summary."
     except Exception as e:
