@@ -41,8 +41,9 @@ embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 EMBEDDING_DIM = 384  # Dimension of all-MiniLM-L6-v2 embeddings
 
 # Legal Prompt Template
+
 LEGAL_PROMPT_TEMPLATE = """
-You are a legal expert specializing in Indian law, including IPC, CrPC, the Constitution of India, and case laws. Your task is to provide a well-structured, informative, and up-to-date response to the following legal query.
+You are a legal expert specializing in Indian law, including IPC, CrPC, the Constitution of India, and case laws. Your task is to provide a well-structured, informative, and up-to-date response to the following legal query, written in your own words to avoid direct recitation of copyrighted texts.
 
     **User's Legal Question:**  
     {query}
@@ -157,6 +158,20 @@ def retrieve_documents(query: str, top_k: int = 5) -> List[str]:
 # Web Search
 INDIAN_LAW_KEYWORDS = ["Indian Penal Code", "IPC", "CrPC", "Constitution of India", "Supreme Court"]
 
+# Query Converter to Bypass Copyright Issues
+def convert_query(query: str) -> str:
+    """
+    Converts a user query into a form that encourages original explanation rather than recitation.
+    """
+    # Common patterns that might trigger recitation (e.g., asking for definitions or sections directly)
+    if "what is" in query.lower() or "define" in query.lower() or "section" in query.lower():
+        return f"Explain the purpose and significance of {query} in the context of Indian law, using original wording."
+    elif "purpose of" in query.lower() or "why" in query.lower():
+        return f"Provide an original analysis of {query} under Indian legal principles."
+    else:
+        # Generic fallback: Ask for an explanation in broader terms
+        return f"Analyze and explain {query} in the context of Indian law, avoiding direct quotes from legal texts."
+
 def google_search(query: str) -> List[str]:
     try:
         url = "https://serpapi.com/search"
@@ -205,12 +220,13 @@ async def ask_legal_chatbot(
     total_weight = doc_weight + web_weight
     if total_weight != 100.0:
         raise HTTPException(status_code=400, detail="Weights must sum to 100%.")
-    
+    converted_query = convert_query(query)
     latest_updates = get_search_results(query)
     retrieved_docs = retrieve_documents(query)
     response = summarize_content(query, retrieved_docs, latest_updates, doc_weight, web_weight)
     return {
         "query": query,
+        "converted_query": converted_query,
         "sources": latest_updates,
         "retrieved_documents": retrieved_docs,
         "response": response,

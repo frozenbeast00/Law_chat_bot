@@ -226,6 +226,7 @@ import requests
 import os
 import time
 # Base URL for the backend API
+# BASE_URL = "http://localhost:8000"
 BASE_URL = "https://law-chat-bot.onrender.com"  # Adjust based on deployment
 
 # Set page configuration
@@ -339,7 +340,7 @@ if (st.session_state.query_submitted and query != st.session_state.last_query) o
         with st.spinner("Fetching response..."):
             try:
                 params = {"query": query, "doc_weight": doc_weight, "web_weight": web_weight}
-                response = requests.get(f"{BASE_URL}/ask", params=params, timeout=15).json()
+                response = requests.get(f"{BASE_URL}/ask", params=params).json()
                 
                 st.subheader("📝 Generated Response")
                 st.markdown(response.get("response", "No response generated."), unsafe_allow_html=True)
